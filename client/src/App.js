@@ -7,6 +7,15 @@ import { gql } from 'apollo-boost'
 
 const App = () => {
   const [page, setPage] = useState('authors')
+  const [errorMessage, setErrorMessage] = useState(null)
+
+  const handleError = (error) => {
+    setErrorMessage(error.graphQLErrors[0].message)
+    setTimeout(() => {
+      setErrorMessage(null)
+    }, 10000)
+  }
+
 
   const CREATE_BOOK = gql`
   mutation createBook($title: String!, $author: String!, $published: Int!, $genres: [String!]!) {
@@ -33,6 +42,13 @@ const App = () => {
         <button onClick={() => setPage('add')}>add book</button>
       </div>
 
+      {
+        errorMessage &&
+        <div style={{color: 'red'}}>
+          {errorMessage}
+        </div>
+      }
+
       <Authors
         show={page === 'authors'}
       />
@@ -43,6 +59,7 @@ const App = () => {
       <Mutation 
         mutation={CREATE_BOOK}
         refetchQueries={[{query: ALL_AUTHORS}, {query: ALL_BOOKS}]}
+        onError={handleError}
         >
         {
           (addBook) =>         

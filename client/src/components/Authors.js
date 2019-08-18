@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Query } from 'react-apollo'
 import { gql } from 'apollo-boost'
 
-const ALL_AUTHORS = gql`
+export const ALL_AUTHORS = gql`
 {
   allAuthors {
     name
@@ -12,7 +12,7 @@ const ALL_AUTHORS = gql`
 }
 `
 
-const Authors = (props) => {
+export const Authors = (props) => {
   if (!props.show) {
     return null
   }
@@ -55,5 +55,3 @@ const Authors = (props) => {
   </Query>
 
 }
-
-export default Authors

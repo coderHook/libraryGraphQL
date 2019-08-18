@@ -2,7 +2,7 @@ import React from 'react'
 import { Query } from 'react-apollo'
 import { gql } from 'apollo-boost'
 
-const ALL_BOOKS = gql`
+export const ALL_BOOKS = gql`
 { 
   allBooks {
     title
@@ -12,7 +12,7 @@ const ALL_BOOKS = gql`
 }
 `
 
-const Books = (props) => {
+export const Books = (props) => {
   if (!props.show) {
     return null
   }
@@ -60,4 +60,3 @@ const Books = (props) => {
 
 }
 
-export default Books

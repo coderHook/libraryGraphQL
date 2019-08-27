@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { Query } from 'react-apollo'
 import { gql } from 'apollo-boost'
+import { Mutation } from 'react-apollo'
+
 
 export const ALL_AUTHORS = gql`
 {
@@ -12,10 +14,23 @@ export const ALL_AUTHORS = gql`
 }
 `
 
+const EDIT_YEAR = gql`
+  mutation editAuthor($name: String!, $born: Int){
+    editAuthor(name: $name, setBornTo: $born) {
+      name
+      born
+      id
+      bookCount
+    }
+  }
+`
+
 export const Authors = (props) => {
+
   if (!props.show) {
     return null
   }
+
   let authors = []
 
   return <Query query={ALL_AUTHORS}>
@@ -25,7 +40,9 @@ export const Authors = (props) => {
       }
 
       console.log(result)
+
       authors = authors.concat(result.data.allAuthors)
+
       return (
         <div>
           <h2>authors</h2>
@@ -49,9 +66,51 @@ export const Authors = (props) => {
               )}
             </tbody>
           </table>
+          <h3>Set Birthyear</h3>
+          <Mutation 
+            mutation={EDIT_YEAR}
+            refetchQueries={[{query: ALL_AUTHORS}]}
+          >
+            {
+              (editAuthor) => 
+              <AuthorForm
+                editAuthor={editAuthor}
+              />
+            }
+
+          </Mutation>
+
+
         </div>
       )
     }}
   </Query>
 
+}
+
+const AuthorForm = (props) => {
+  const [name, setName] = useState('')
+  const [born, setBorn] = useState('')
+
+  const submit = async (e) => {
+    e.preventDefault()
+
+    console.log('Updating Author...', name, born)
+
+    await props.editAuthor({
+      variables: {name, born}
+    })
+
+    setName('')
+    setBorn('')
+
+  }
+
+  return (
+    <form action="">
+      <p>Name: <input type="text" value={name} onChange={({ target }) => setName(target.value)} /> </p>
+      <p>Born: <input type="text" value={born} onChange={({ target }) => setBorn(Number(target.value))} /> </p>
+      <button onClick={submit}>update author</button>
+  </form>
+  )
 }

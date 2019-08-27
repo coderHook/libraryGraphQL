@@ -1,6 +1,4 @@
 import React, { useState } from 'react'
-import { Mutation } from 'react-apollo'
-import { gql } from 'apollo-boost'
 
 const NewBook = (props) => {
   const [title, setTitle] = useState('')

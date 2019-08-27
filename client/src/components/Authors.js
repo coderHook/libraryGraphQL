@@ -69,7 +69,6 @@ export const Authors = (props) => {
           <h3>Set Birthyear</h3>
           <Mutation 
             mutation={EDIT_YEAR}
-            refetchQueries={[{query: ALL_AUTHORS}]}
           >
             {
               (editAuthor) => 

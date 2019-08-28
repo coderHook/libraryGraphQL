@@ -3,7 +3,6 @@ import { Query } from 'react-apollo'
 import { gql } from 'apollo-boost'
 import { Mutation } from 'react-apollo'
 
-
 export const ALL_AUTHORS = gql`
 {
   allAuthors {
@@ -40,7 +39,7 @@ export const Authors = (props) => {
 
       console.log(result)
 
-      authors = authors.concat(result.data.allAuthors)
+      authors = result.data.allAuthors
 
       return (
         <div>
@@ -65,15 +64,18 @@ export const Authors = (props) => {
               )}
             </tbody>
           </table>
+          
           <h3>Set Birthyear</h3>
+
           <Mutation 
             mutation={EDIT_YEAR}
+            refetchQueries={[{ query: ALL_AUTHORS }]}
           >
             {
               (editAuthor) => 
-              <AuthorForm
-                editAuthor={editAuthor}
-              />
+                <AuthorForm
+                  editAuthor={editAuthor}
+                />
             }
 
           </Mutation>
@@ -101,7 +103,6 @@ const AuthorForm = (props) => {
 
     setName('')
     setBorn('')
-
   }
 
   return (

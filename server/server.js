@@ -77,7 +77,7 @@ const resolvers = {
       if(!authorExists) {
         authors = authors.concat({
           name: args.author,
-          id: uuid
+          id: uuid()
         })
       }
 

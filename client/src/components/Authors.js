@@ -19,7 +19,6 @@ const EDIT_YEAR = gql`
     editAuthor(name: $name, setBornTo: $born) {
       name
       born
-      id
       bookCount
     }
   }

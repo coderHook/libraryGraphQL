@@ -74,6 +74,7 @@ export const Authors = (props) => {
             {
               (editAuthor) => 
                 <AuthorForm
+                  authors={authors}
                   editAuthor={editAuthor}
                 />
             }
@@ -107,7 +108,16 @@ const AuthorForm = (props) => {
 
   return (
     <form action="">
-      <p>Name: <input type="text" value={name} onChange={({ target }) => setName(target.value)} /> </p>
+      <select name="Select a name" id="" value={name} onChange={({target}) => setName(target.value)}
+      >
+        <option value="">Select a Name: </option>
+        {
+          props.authors.map(a => {
+            return <option value={a.name}>{a.name}</option>
+          })
+        }
+      </select>
+      {/* <p>Name: <input type="text" value={name} onChange={({ target }) => setName(target.value)} /> </p> */}
       <p>Born: <input type="text" value={born} onChange={({ target }) => setBorn(Number(target.value))} /> </p>
       <button onClick={submit}>update author</button>
   </form>

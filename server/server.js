@@ -33,7 +33,7 @@ const typeDefs = gql`
 
   type Book {
     title: String!
-    author: Author!
+    author: String!
     published: Int!
     genres: [String!]
     id: ID!
@@ -78,8 +78,6 @@ const resolvers = {
     const authors = await Authors.find({})
     const books = await Books.find({})
 
-    console.log('authors', authors)
-
     return authors.map(a => ({
       name: a.name, 
       born: a.born, 
@@ -89,25 +87,45 @@ const resolvers = {
   },
 
   Mutation: {
-    addBook: (root, args) => {
+    addBook: async (root, args) => {
+      console.log('Im mutating!!!!!')
       // Check if the book was already added
-      if(Books.find({name: args.title})) {
+      if(await Books.find({title: args.title}).length > 0) {
+        console.log(await Books.find({title: args.title}))
         throw new UserInputError('This book already exists!', {
-          invalidArgs: args.name
+          invalidArgs: args.title
         })
       }
 
-      const authorExists = authors.find(a => a.name === args.author)
+      const authorExists = await Authors.find({name: args.author}).length > 0
+      console.log('exists!!!', authorExists)
 
       if(!authorExists) {
-        authors = authors.concat({
-          name: args.author,
-          id: uuid()
+        // create new author
+        const author2add = new Authors({name: args.author})
+
+        // save in DB new Author
+        try {
+          console.log('saving author!!!!')
+          await author2add.save()
+        } catch (error) {
+            throw new UserInputError(error.message, {
+          invalidArgs: args
         })
       }
+    }
 
-      const book = {...args, id: uuid() }
-      books = books.concat(book)
+    // Create new book
+    const book = new Books({...args})
+
+    // Save new book
+    try {
+      await book.save()
+    } catch (error) {
+      throw new UserInputError(error.message, {
+        invalidArgs: args
+      })
+    }
 
       return book
     },

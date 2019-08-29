@@ -73,14 +73,27 @@ const resolvers = {
       return books
     },
 
-    allAuthors: () =>
+    allAuthors: async () => {
+
+    const authors = await Authors.find({})
+    const books = await Books.find({})
+
+    console.log('count books', books.length)
+
+    return authors.map(author => ({
+        ...author,
+        bookCount: 3
+      }))
+      
+    /* 
     authors.map(author => ({
       ...author, 
       bookCount: books.filter(book =>
         book.author === author.name
       ).length
-    }))
-    
+    })) 
+    */
+    }
   },
 
   Mutation: {

@@ -3,15 +3,15 @@ const uuid = require('uuid/v1')
 const mongoose = require('mongoose')
 
 // Models
-const authors = require('./models/author.model.js')
-const books = require('./models/book.model.js')
+const Authors = require('./models/author.model.js')
+const Books = require('./models/book.model.js')
 
 // Pre-DB
 // let { authors, books } = require('./data')
 
 mongoose.set('useFindAndModify', false)
 
-const MONGODB_URI = 'mongodb+srv://fullstack:fullstack@cluster0-ostce.mongodb.net/graphql?retryWrites=true'
+const MONGODB_URI = 'mongodb+srv://fullstack:fullstack@cluster0-ostce.mongodb.net/library?retryWrites=true'
 
 console.log('connecting to', MONGODB_URI)
 
@@ -63,8 +63,8 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    bookCount: () => books.length,
-    authorCount: () => authors.length,
+    bookCount: () => Books.collection.countDocuments(),
+    authorCount: () => Authors.collection.countDocuments(),
     allBooks: (root, args) => {
       let result = books;
       if(args.author) result = books.filter( book => book.author === args.author )

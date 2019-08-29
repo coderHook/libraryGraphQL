@@ -78,28 +78,20 @@ const resolvers = {
     const authors = await Authors.find({})
     const books = await Books.find({})
 
-    console.log('count books', books.length)
+    console.log('authors', authors)
 
-    return authors.map(author => ({
-        ...author,
-        bookCount: 3
-      }))
-      
-    /* 
-    authors.map(author => ({
-      ...author, 
-      bookCount: books.filter(book =>
-        book.author === author.name
-      ).length
-    })) 
-    */
+    return authors.map(a => ({
+      name: a.name, 
+      born: a.born, 
+      bookCount: books.filter(b => b.name === a.name).length
+    }))
     }
   },
 
   Mutation: {
     addBook: (root, args) => {
       // Check if the book was already added
-      if(books.find(b => b.title === args.title)) {
+      if(Books.find({name: args.title})) {
         throw new UserInputError('This book already exists!', {
           invalidArgs: args.name
         })

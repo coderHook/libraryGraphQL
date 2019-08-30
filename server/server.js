@@ -139,7 +139,7 @@ const resolvers = {
 
       if(authorToEdit) {
         // authorToEdit.born = args.setBornTo
-        return Authors.update(authorToEdit, {$set: {born: args.setBornTo}})
+        return Authors.updateOne(authorToEdit, {$set: {born: args.setBornTo}})
       }
 
       return null

@@ -74,15 +74,14 @@ const resolvers = {
     },
 
     allAuthors: async () => {
-
     const authors = await Authors.find({})
     const books = await Books.find({})
 
     return authors.map(a => ({
-      name: a.name, 
-      born: a.born, 
-      bookCount: books.filter(b => b.name === a.name).length
-    }))
+        name: a.name, 
+        born: a.born, 
+        bookCount: books.filter(b => b.name === a.name).length
+      }))
     }
   },
 
@@ -118,8 +117,6 @@ const resolvers = {
     }
 
     // Create new book
-    // const findAuthorID = await Authors.find({name: args.author})
-    // console.log('FIND_AUTHOR_ID', findAuthorID)
     const book2save = new Books({...args})
     console.log('This BOOK!', book2save)
     // Save new book
@@ -138,11 +135,11 @@ const resolvers = {
     },
 
     editAuthor: (root, args) => {
-      let authorToEdit = authors.find(a => a.name === args.name)
+      let authorToEdit = Authors.find({name: args.name})
 
       if(authorToEdit) {
-        authorToEdit.born = args.setBornTo
-        return authorToEdit
+        // authorToEdit.born = args.setBornTo
+        return Authors.update(authorToEdit, {$set: {born: args.setBornTo}})
       }
 
       return null

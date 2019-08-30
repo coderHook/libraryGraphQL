@@ -80,13 +80,10 @@ export const Authors = (props) => {
             }
 
           </Mutation>
-
-
         </div>
       )
     }}
   </Query>
-
 }
 
 const AuthorForm = (props) => {

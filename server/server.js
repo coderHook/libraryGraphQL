@@ -40,10 +40,10 @@ const typeDefs = gql`
   }
 
   type Author {
-    id: ID!
     name: String
     born: Int
     bookCount: Int
+    id: ID!
   }
 
   type Mutation {
@@ -97,7 +97,8 @@ const resolvers = {
         })
       }
 
-      const authorExists = await Authors.find({name: args.author}).length > 0
+      const findAuthor = await Authors.find({name: args.author})
+      const authorExists = findAuthor.length > 0
       console.log('exists!!!', authorExists)
 
       if(!authorExists) {
@@ -109,6 +110,7 @@ const resolvers = {
           console.log('saving author!!!!')
           await author2add.save()
         } catch (error) {
+          console.log('error on adding author')
             throw new UserInputError(error.message, {
           invalidArgs: args
         })
@@ -116,18 +118,23 @@ const resolvers = {
     }
 
     // Create new book
-    const book = new Books({...args})
-
+    // const findAuthorID = await Authors.find({name: args.author})
+    // console.log('FIND_AUTHOR_ID', findAuthorID)
+    const book2save = new Books({...args})
+    console.log('This BOOK!', book2save)
     // Save new book
     try {
-      await book.save()
+      console.log('trying to save book')
+      await book2save.save()
     } catch (error) {
+      console.log('error on adding book')
+
       throw new UserInputError(error.message, {
         invalidArgs: args
       })
     }
 
-      return book
+      return book2save
     },
 
     editAuthor: (root, args) => {

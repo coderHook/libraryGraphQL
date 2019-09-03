@@ -113,7 +113,13 @@ const resolvers = {
 
   Mutation: {
     addBook: async (root, args) => {
-      console.log('Im mutating!!!!!')
+      const currentUser = context.currentUser
+
+      // Only possible if there is a valid Token
+      if(!currentUser) {
+        throw new AuthenticationError("not authenticated")
+      }
+
       // Check if the book was already added
       if(await Books.find({title: args.title}).length > 0) {
         console.log(await Books.find({title: args.title}))
@@ -162,6 +168,13 @@ const resolvers = {
 
     editAuthor: (root, args) => {
       let authorToEdit = Authors.find({name: args.name})
+
+      const currentUser = context.currentUser
+
+      // Only possible if there is a valid Token
+      if(!currentUser) {
+        throw new AuthenticationError("not authenticated")
+      }
 
       if(authorToEdit) {
         // authorToEdit.born = args.setBornTo

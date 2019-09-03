@@ -1,6 +1,9 @@
 const { ApolloServer, gql, UserInputError } = require('apollo-server')
 const uuid = require('uuid/v1')
 const mongoose = require('mongoose')
+const jwt = require('jsonwebtoken')
+
+const JWT_SECRET = 'MY_SECRET_KEY_FOR_LEARNING_PURPOSES'
 
 // Models
 const Authors = require('./models/author.model.js')
@@ -24,11 +27,22 @@ mongoose.connect(MONGODB_URI, { useNewUrlParser: true })
   })
 
 const typeDefs = gql`
+  type User {
+    username: String!
+    favoriteGenre: String!
+    id: ID!
+  }
+
+  type Token {
+    value: String!
+  }
+
   type Query {
     bookCount: Int!,
     authorCount: Int!,
     allBooks(author: String, genre: String): [Book],
     allAuthors: [Author!]!
+    me: User
   }
 
   type Book {
@@ -58,6 +72,16 @@ const typeDefs = gql`
       name: String!
       setBornTo: Int
     ): Author
+
+    createUser(
+      username: String!
+      favoriteGenre: String!
+    ): User
+  
+    login(
+      username: String!
+      password: String!
+    ): Token
   }
 `
 
@@ -72,7 +96,6 @@ const resolvers = {
 
       return books
     },
-
     allAuthors: async () => {
     const authors = await Authors.find({})
     const books = await Books.find({})
@@ -82,7 +105,10 @@ const resolvers = {
         born: a.born, 
         bookCount: books.filter(b => b.name === a.name).length
       }))
-    }
+    },
+    me: (root, args, context) => {
+      return context.currentUser
+    },
   },
 
   Mutation: {
@@ -143,13 +169,44 @@ const resolvers = {
       }
 
       return null
+    },
+
+    login: async (root, args) => {
+      const user = await User.findOne({ username: args. username })
+
+      // Password is hardcoded to simplify the app. 
+      if(!user || args.password !== 'secreto') {
+        throw new UserInputError("Wrong Credentials!")
+      }
+
+      const userForToken = {
+        username: user.username,
+        id: user._id
+      }
+
+      return {
+        value: jwt.sign(userForToken, JWT_SECRET)
+      }
     }
   }
 }
 
 const server = new ApolloServer({
   typeDefs,
-  resolvers
+  resolvers,
+  context: async ({ req }) => {
+    const auth = req ? req.headers.authorization : null
+
+    if ( auth && auth.toLowerCase().startsWith('bearer')) {
+      const decodedToken = jwt.verify(
+        auth.substring(7), JWT_SECRET
+      )
+
+      const currentUser = await User.findById(decodedToken.id)
+
+      return { currentUser }
+    }
+  }
 });
 
 server.listen().then(({url}) => {
